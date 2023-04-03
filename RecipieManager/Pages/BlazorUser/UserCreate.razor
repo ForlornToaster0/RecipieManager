@@ -1,0 +1,57 @@
+﻿@page "/user/create"
+@using Backend.Repositories;
+@using Backend.Models;
+@using Backend.Context;
+@inject RecipeManagementContext _context
+@inject IRepository<User> _userRepository
+
+<h1>Add User</h1>
+
+<div>
+    <label>Name:</label>
+    <input type="text" @bind="@UserName" />
+</div>
+
+<div>
+    <label>Email:</label>
+    <input type="email" @bind="@UserEmail" />
+</div>
+
+<div>
+    <label>Password:</label>
+    <input type="password" @bind="@UserPassword" />
+</div>
+
+<div>
+    <label>Permission level:</label>
+    <input type="number" @bind="@UserPermisionlevel" min="0" max="3" step="1" />
+</div>
+
+
+
+<button @onclick="AddUser">Add User</button>
+
+@code {
+
+    private string UserName { get; set; } = "";
+    private string? UserEmail { get; set; }
+    private string? UserPassword { get; set; }
+    private byte UserPermisionlevel { get; set; }
+
+
+
+
+    private async Task AddUser()
+    {
+        var newUser = new User
+            {
+                UserName = UserName,
+                UserEmail = UserEmail,
+                UserPassword = UserPassword,
+                UserPermisionlevel = UserPermisionlevel
+            };
+
+        await _userRepository.AddAsync(newUser);
+    }
+
+}

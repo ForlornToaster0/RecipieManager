@@ -1,0 +1,44 @@
+﻿@page "/user/update/{id:int}"
+@using Backend.Repositories;
+@using Backend.Models;
+@using Backend.Context;
+@inject IRepository<User> userRepository
+@inject NavigationManager navigationManager
+
+<h1>Update User Information</h1>
+
+@if (user == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div>
+        <label>User Name:</label>
+        <input type="text" @bind="@user.UserName" />
+
+        <label>User Email:</label>
+        <input type="email" @bind="@user.UserEmail" />
+
+        <label>User Permission Level:</label>
+        <input type="number" @bind="@user.UserPermisionlevel" />
+
+        <button @onclick="@UpdateUser">Update User</button>
+    </div>
+}
+
+@code {
+    private User user;
+    [Parameter] public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await userRepository.GetByIdAsync(Id);
+    }
+
+    private async Task UpdateUser()
+    {
+        await userRepository.UpdateAsync(user);
+        navigationManager.NavigateTo("/users");
+    }
+}

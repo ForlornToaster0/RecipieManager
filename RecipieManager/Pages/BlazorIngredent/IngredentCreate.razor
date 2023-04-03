@@ -1,0 +1,81 @@
+﻿@page "/ingredients/create"
+@using Backend.Models
+@using Backend.Repositories
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+@inject IRepository<Ingredient> IngredientRepository
+@implements IDisposable
+
+<h1>Create Ingredient</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <form>
+            <div class="form-group">
+                <label for="name">Ingredient Name:</label>
+                <input type="text" class="form-control" id="name" @bind="Ingredient.IngredientName" />
+            </div>
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <textarea class="form-control" id="description" rows="3" @bind="Ingredient.IngredientDescription"></textarea>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="isAllergen" @bind="Ingredient.IsAllergen" />
+                <label class="form-check-label" for="isAllergen">Is Allergen?</label>
+            </div>
+            <button type="submit" class="btn btn-primary" @onclick="CreateIngredient">Create</button>
+            <a class="btn btn-secondary" href="/ingredients">Cancel</a>
+        </form>
+    </div>
+</div>
+
+@code {
+    private Ingredient Ingredient = new Ingredient();
+    private bool disposedValue;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposedValue)
+        {
+            if (disposing)
+            {
+                // dispose managed state (managed objects)
+            }
+
+            // free unmanaged resources (unmanaged objects) and override finalizer
+            // set large fields to null
+            disposedValue = true;
+        }
+    }
+
+    // override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+    // ~CreateIngredient() {
+    //   // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+    //   Dispose(disposing: false);
+    // }
+
+    public void Dispose()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    public async Task CreateIngredient()
+    {
+        try
+        {
+            await IngredientRepository.AddAsync(Ingredient);
+            Navigation.NavigateTo("/ingredients");
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeAsync<object>("alert", $"Error creating ingredient: {ex.Message}");
+        }
+    }
+}

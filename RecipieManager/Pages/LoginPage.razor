@@ -1,0 +1,41 @@
+﻿@page "/login"
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+<h1>Login</h1>
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <p>@ErrorMessage</p>
+}
+
+<form>
+    <div class="form-group">
+        <label for="username">Username:</label>
+        <input type="text" class="form-control" id="username" name="username" @bind="Username">
+    </div>
+    <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" class="form-control" id="password" name="password" @bind="Password">
+    </div>
+    <button type="submit" class="btn btn-primary" @onclick="Login">Login</button>
+</form>
+
+@code {
+    private string Username { get; set; }
+    private string Password { get; set; }
+    private string ErrorMessage { get; set; }
+    
+    private async Task Login()
+    {
+        // TODO: Implement login logic using a service or repository
+        if (Username == "admin" && Password == "admin")
+        {
+            NavigationManager.NavigateTo("/dashboard");
+        }
+        else
+        {
+            ErrorMessage = "Invalid username or password";
+        }
+    }
+}
