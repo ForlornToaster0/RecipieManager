@@ -1,4 +1,4 @@
-﻿@page "/dashboard"
+﻿@page "/"
 @using Backend.Repositories
 @using Backend.Models
 @using Backend.Context
@@ -78,6 +78,6 @@ else
 
     private async Task RefreshPage()
     {
-        NavigationManager.NavigateTo("/dashboard", forceLoad: true);
+        NavigationManager.NavigateTo("/", forceLoad: true);
     }
 }

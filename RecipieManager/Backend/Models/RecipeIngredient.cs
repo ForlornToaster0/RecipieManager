@@ -12,6 +12,9 @@ namespace RecipieManager.Backend.Models
         [Key, Column(Order = 1)]
         public int IngredientId { get; set; }
         public Ingredient Ingredient { get; set; }
-    }
 
+        public decimal IngredientQuantity { get; set; }
+
+        public string IngredientUnit { get; set; }
+    }
 }
