@@ -1,0 +1,84 @@
+﻿Samuel Andersson
+@page "/recipes/create"
+@using Backend.Repositories
+@using Backend.Models
+@using Backend.Context
+@inject IRepository<Recipe> RecipeRepository
+@inject IRepository<Ingredient> IngredientRepository
+@inject NavigationManager NavigationManager
+
+<h1>Create Recipe</h1>
+
+<form>
+    <div class="form-group">
+        <label for="recipeNameInput">Recipe Name</label>
+        <input type="text" class="form-control" id="recipeNameInput" @bind-value="@Recipe.RecipeName" />
+    </div>
+    <div class="form-group">
+        <label for="recipeDescriptionInput">Recipe Description</label>
+        <textarea class="form-control" id="recipeDescriptionInput" rows="3" @bind="@Recipe.RecipeDescription"></textarea>
+    </div>
+    <div class="form-group">
+        <label for="recipeInstructionsInput">Recipe Instructions</label>
+        <textarea class="form-control" id="recipeInstructionsInput" rows="5" @bind="@Recipe.RecipeInstructions"></textarea>
+    </div>
+    <div class="form-group">
+        <label for="ingredientInput">Ingredients</label>
+        <select class="form-control" id="ingredientInput" @bind="@SelectedIngredientId">
+            <option value="">--Select an Ingredient--</option>
+            @foreach (var ingredient in ingredients)
+            {
+                <option value="@ingredient.IngredientId">@ingredient.IngredientName</option>
+            }
+        </select>
+    </div>
+    <button type="button" class="btn btn-primary" @onclick="AddIngredient">Add Ingredient</button>
+    <hr />
+    <h3>Ingredients</h3>
+    <ul>
+        @foreach (var recipeIngredient in RecipeIngredients)
+        {
+            <li>@recipeIngredient.Ingredient.IngredientName</li>
+        }
+    </ul>
+    <button type="button" class="btn btn-success"></button>
+</form>
+
+@code {
+private Recipe Recipe { get; set; } = new Recipe();
+private List<Ingredient> ingredients = new List<Ingredient>();
+private List<RecipeIngredient> RecipeIngredients { get; set; } = new List<RecipeIngredient>();
+private int SelectedIngredientId { get; set; }
+
+
+protected override async Task OnInitializedAsync()
+{
+    ingredients = await IngredientRepository.GetAllAsync();
+}
+
+private void AddIngredient()
+{
+    if (SelectedIngredientId == 0 || RecipeIngredients.Any(x => x.IngredientId == SelectedIngredientId))
+    {
+        return;
+    }
+
+    RecipeIngredients.Add(new RecipeIngredient
+    {
+        IngredientId = SelectedIngredientId,
+        Ingredient = ingredients.FirstOrDefault(x => x.IngredientId == SelectedIngredientId)
+    });
+
+    SelectedIngredientId = 0;
+}
+
+private async Task CreateRecipe()
+{
+    Recipe.RecipeIngredients = RecipeIngredients;
+
+    await RecipeRepository.AddAsync(Recipe);
+
+    NavigationManager.NavigateTo("/");
+}
+
+}

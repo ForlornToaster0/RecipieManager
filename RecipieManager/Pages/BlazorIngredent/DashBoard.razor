@@ -1,0 +1,83 @@
+﻿@page "/dashboard"
+@using Backend.Repositories
+@using Backend.Models
+@using Backend.Context
+@inject IRepository<Recipe> RecipeRepository
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+<h1>Recipes</h1>
+
+@if (recipes == null)
+{
+    <p>Loading...</p>
+}
+else if (recipes.Count == 0)
+{
+    <p>No recipes found.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Instructions</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var recipe in recipes)
+            {
+                <tr>
+                    <td>@recipe.RecipeId</td>
+                    <td>@recipe.RecipeName</td>
+                    <td>@recipe.RecipeDescription</td>
+                    <td>@recipe.RecipeInstructions</td>
+                    <td>
+                        <button class="btn btn-primary" @onclick="@(() => NavigateToEdit(recipe))">Edit</button>
+                        <button class="btn btn-danger" @onclick="@(() => DeleteRecipe(recipe))">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<button class="btn btn-success" @onclick="@NavigateToCreate">Create</button>
+
+@code {
+    private List<Recipe> recipes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        recipes = await RecipeRepository.GetAllAsync();
+    }
+
+    private void NavigateToCreate()
+    {
+        NavigationManager.NavigateTo("/recipes/create");
+    }
+
+    private void NavigateToEdit(Recipe recipe)
+    {
+        NavigationManager.NavigateTo($"/edit/{recipe.RecipeId}");
+    }
+
+    private async Task DeleteRecipe(Recipe recipe)
+    {
+        bool confirmed = await JS.InvokeAsync<bool>("confirm", "Are you sure you want to delete this recipe?");
+        if (confirmed)
+        {
+            await RecipeRepository.DeleteAsync(recipe.RecipeId);
+            await RefreshPage();
+        }
+    }
+
+    private async Task RefreshPage()
+    {
+        NavigationManager.NavigateTo("/dashboard", forceLoad: true);
+    }
+}

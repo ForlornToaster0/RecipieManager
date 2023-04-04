@@ -10,6 +10,8 @@ namespace RecipieManager.Backend.Models
         public string RecipeName { get; set; }
         public string RecipeDescription { get; set; }
         public string RecipeInstructions { get; set; }
+
+        public ICollection<RecipeIngredient> RecipeIngredients { get; set; }
     }
 
 }

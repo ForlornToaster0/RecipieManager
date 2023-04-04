@@ -34,10 +34,14 @@ namespace RecipieManager.Backend.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(T entity)
+        public async Task DeleteAsync(int id)
         {
-            _context.Set<T>().Remove(entity);
-            await _context.SaveChangesAsync();
+            var entity = await GetByIdAsync(id);
+            if (entity != null)
+            {
+                _context.Set<T>().Remove(entity);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

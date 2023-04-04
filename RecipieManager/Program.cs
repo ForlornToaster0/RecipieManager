@@ -13,6 +13,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<IRepository<User>, Repository<User>>();
 builder.Services.AddScoped<IRepository<Ingredient>, Repository<Ingredient>>();
+builder.Services.AddScoped<IRepository<Recipe>, Repository<Recipe>>();
 builder.Services.AddScoped<IUserIngredientsRepository, UserIngredientsRepository>();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddDbContext<RecipeManagementContext>(options =>

@@ -1,0 +1,56 @@
+﻿@page "/ingredients/edit/{id}"
+@using Backend.Repositories
+@using Backend.Models
+@using Backend.Context
+@inject IRepository<Ingredient> IngredientRepository
+@inject NavigationManager NavigationManager
+
+<h1>Edit Ingredient</h1>
+
+@if (Ingredient == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="card">
+        <div class="card-header">
+            <h4>@Ingredient.IngredientName</h4>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="form-group">
+                    <label for="nameInput">Name</label>
+                    <input type="text" class="form-control" id="nameInput" placeholder="Enter name" @bind-value="@Ingredient.IngredientName">
+                </div>
+                <div class="form-group">  
+                    <label for="descriptionInput">Description</label>
+                    <textarea class="form-control" id="descriptionInput" rows="3" @bind="@Ingredient.IngredientDescription"></textarea>
+                </div>
+                <div class="form-group form-check">
+                    <input type="checkbox" class="form-check-input" id="allergenCheck" @bind-value="@Ingredient.IsAllergen">
+                    <label class="form-check-label" for="allergenCheck">Is Allergen?</label>
+                </div>
+                <button type="submit" class="btn btn-primary" @onclick="UpdateIngredient">Update</button>
+                <a href="/ingredients" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+}
+
+@code {
+    private Ingredient Ingredient;
+    [Parameter]
+    public string id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Ingredient = await IngredientRepository.GetByIdAsync(Convert.ToInt32(id));
+    }
+
+    public async Task UpdateIngredient()
+    {
+        await IngredientRepository.UpdateAsync(Ingredient);
+        NavigationManager.NavigateTo("/ingredients");
+    }
+}

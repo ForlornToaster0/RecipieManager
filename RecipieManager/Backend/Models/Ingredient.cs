@@ -10,6 +10,9 @@ namespace RecipieManager.Backend.Models
         public string IngredientName { get; set; }
         public string IngredientDescription { get; set; }
         public bool IsAllergen { get; set; } = false;
+
+
+        public ICollection<RecipeIngredient> RecipeIngredients { get; set; }
     }
 
 }
