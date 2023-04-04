@@ -1,5 +1,4 @@
-﻿Samuel Andersson
-@page "/recipes/create"
+﻿@page "/recipes/create"
 @using Backend.Repositories
 @using Backend.Models
 @using Backend.Context
@@ -32,53 +31,66 @@
             }
         </select>
     </div>
+    <div class="form-group">
+        <label for="ingredientQuantityInput">Quantity</label>
+        <input type="number" class="form-control" id="ingredientQuantityInput" @bind-value="@SelectedIngredientQuantity" />
+    </div>
+    <div class="form-group">
+        <label for="ingredientUnitInput">Unit</label>
+        <input type="text" class="form-control" id="ingredientUnitInput" @bind-value="@SelectedIngredientUnit" />
+    </div>
     <button type="button" class="btn btn-primary" @onclick="AddIngredient">Add Ingredient</button>
     <hr />
     <h3>Ingredients</h3>
     <ul>
         @foreach (var recipeIngredient in RecipeIngredients)
         {
-            <li>@recipeIngredient.Ingredient.IngredientName</li>
+            <li>@recipeIngredient.IngredientQuantity @recipeIngredient.IngredientUnit of @recipeIngredient.Ingredient.IngredientName</li>
         }
     </ul>
-    <button type="button" class="btn btn-success"></button>
+    <button type="button" class="btn btn-success" @onclick="CreateRecipe">Create Recipe</button>
 </form>
 
 @code {
-private Recipe Recipe { get; set; } = new Recipe();
-private List<Ingredient> ingredients = new List<Ingredient>();
-private List<RecipeIngredient> RecipeIngredients { get; set; } = new List<RecipeIngredient>();
-private int SelectedIngredientId { get; set; }
+    private Recipe Recipe { get; set; } = new Recipe();
+    private List<Ingredient> ingredients = new List<Ingredient>();
+    private List<RecipeIngredient> RecipeIngredients { get; set; } = new List<RecipeIngredient>();
+    private int SelectedIngredientId { get; set; }
+    private decimal SelectedIngredientQuantity { get; set; }
+    private string SelectedIngredientUnit { get; set; }
 
 
-protected override async Task OnInitializedAsync()
-{
-    ingredients = await IngredientRepository.GetAllAsync();
-}
-
-private void AddIngredient()
-{
-    if (SelectedIngredientId == 0 || RecipeIngredients.Any(x => x.IngredientId == SelectedIngredientId))
+    protected override async Task OnInitializedAsync()
     {
-        return;
+        ingredients = await IngredientRepository.GetAllAsync();
     }
 
-    RecipeIngredients.Add(new RecipeIngredient
+    private void AddIngredient()
     {
-        IngredientId = SelectedIngredientId,
-        Ingredient = ingredients.FirstOrDefault(x => x.IngredientId == SelectedIngredientId)
-    });
+        if (SelectedIngredientId == 0 || RecipeIngredients.Any(x => x.IngredientId == SelectedIngredientId))
+        {
+            return;
+        }
 
-    SelectedIngredientId = 0;
-}
+        RecipeIngredients.Add(new RecipeIngredient
+            {
+                IngredientId = SelectedIngredientId,
+                Ingredient = ingredients.FirstOrDefault(x => x.IngredientId == SelectedIngredientId),
+                IngredientQuantity = SelectedIngredientQuantity,
+                IngredientUnit = SelectedIngredientUnit
+            });
 
-private async Task CreateRecipe()
-{
-    Recipe.RecipeIngredients = RecipeIngredients;
+        SelectedIngredientId = 0;
+        SelectedIngredientQuantity = 0;
+        SelectedIngredientUnit = "";
+    }
 
-    await RecipeRepository.AddAsync(Recipe);
+    private async Task CreateRecipe()
+    {
+        Recipe.RecipeIngredients = RecipeIngredients;
 
-    NavigationManager.NavigateTo("/");
-}
+        await RecipeRepository.AddAsync(Recipe);
 
+        NavigationManager.NavigateTo("/");
+    }
 }

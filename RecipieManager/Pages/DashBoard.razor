@@ -1,4 +1,5 @@
 ﻿@page "/"
+
 @using Backend.Repositories
 @using Backend.Models
 @using Backend.Context
@@ -48,8 +49,24 @@ else
 
 <button class="btn btn-success" @onclick="@NavigateToCreate">Create</button>
 
+@if (Recipe != null)
+{
+    <h3>Ingredients:</h3>
+    <ul>
+        @foreach (var recipeIngredient in Recipe.RecipeIngredients)
+        {
+            <li>@recipeIngredient.IngredientQuantity @recipeIngredient.IngredientUnit - @recipeIngredient.Ingredient.IngredientName</li>
+        }
+    </ul>
+
+    <h3>Instructions:</h3>
+    <p>@Recipe.RecipeInstructions</p>
+}
+
 @code {
     private List<Recipe> recipes;
+    private Recipe Recipe;
+    private ICollection<RecipeIngredient> RecipeIngredients;
 
     protected override async Task OnInitializedAsync()
     {
@@ -79,5 +96,11 @@ else
     private async Task RefreshPage()
     {
         NavigationManager.NavigateTo("/", forceLoad: true);
+    }
+
+    private async Task ViewRecipe(Recipe recipe)
+    {
+        Recipe = recipe;
+        RecipeIngredients = recipe.RecipeIngredients;
     }
 }
