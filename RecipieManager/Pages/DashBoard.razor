@@ -4,10 +4,23 @@
 @using Backend.Models
 @using Backend.Context
 @inject IRepository<Recipe> RecipeRepository
+@inject IInnerJoinRepository InnerJoinRepository
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 
 <h1>Recipes</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form class="form-inline">
+            <div class="form-group">
+                <label for="search-input">Search:</label>
+                <input type="text" class="form-control" id="search-input" @bind-value="searchQuery">
+            </div>
+            <button type="button" class="btn btn-primary ml-2" @onclick="@(() => Search())">Search</button>
+        </form>
+    </div>
+</div>
 
 @if (recipes == null)
 {
@@ -40,6 +53,7 @@ else
                     <td>
                         <button class="btn btn-primary" @onclick="@(() => NavigateToEdit(recipe))">Edit</button>
                         <button class="btn btn-danger" @onclick="@(() => DeleteRecipe(recipe))">Delete</button>
+                        <button class="btn btn-primary" @onclick=@(()=> NavigateToDetail(recipe))>Details</button>
                     </td>
                 </tr>
             }
@@ -67,12 +81,17 @@ else
     private List<Recipe> recipes;
     private Recipe Recipe;
     private ICollection<RecipeIngredient> RecipeIngredients;
+    private string searchQuery = "";
+
 
     protected override async Task OnInitializedAsync()
     {
         recipes = await RecipeRepository.GetAllAsync();
     }
-
+    private void NavigateToDetail(Recipe recipe)
+    {
+        NavigationManager.NavigateTo($"/recipes/{recipe.RecipeId}");
+    }
     private void NavigateToCreate()
     {
         NavigationManager.NavigateTo("/recipes/create");
@@ -80,7 +99,7 @@ else
 
     private void NavigateToEdit(Recipe recipe)
     {
-        NavigationManager.NavigateTo($"/edit/{recipe.RecipeId}");
+        NavigationManager.NavigateTo($"/recipes/{recipe.RecipeId}");
     }
 
     private async Task DeleteRecipe(Recipe recipe)
@@ -103,4 +122,23 @@ else
         Recipe = recipe;
         RecipeIngredients = recipe.RecipeIngredients;
     }
+
+    private async Task Search()
+    {
+        if (string.IsNullOrEmpty(searchQuery))
+        {
+            recipes = await RecipeRepository.GetAllAsync();
+        }
+        else
+        {
+            recipes = await InnerJoinRepository.SearchAsync(searchQuery);
+        }
+    }
+
+    private async Task ClearSearch()
+    {
+        searchQuery = "";
+        recipes = await RecipeRepository.GetAllAsync();
+    }
+
 }

@@ -1,0 +1,44 @@
+﻿@page "/recipes/{id:int}"
+@using Backend.Repositories
+@using Backend.Models
+@using Backend.Context
+@inject IInnerJoinRepository RecipeRepository
+@inject NavigationManager NavigationManager
+
+<h1>Recipe Details</h1>
+
+@if (Recipe != null)
+{
+    <h2>@Recipe.RecipeName</h2>
+    <p>@Recipe.RecipeInstructions</p>
+    <h3>Ingredients:</h3>
+    <ul>
+        @foreach (var recipeIngredient in Recipe.RecipeIngredients)
+        {
+            <li>@recipeIngredient.IngredientQuantity @recipeIngredient.IngredientUnit of @recipeIngredient.Ingredient.IngredientName</li>
+        }
+    </ul>
+}
+else
+{
+    <p>Recipe not found.</p>
+}
+
+<button type="button" class="btn btn-primary" @onclick="GoBack">Go Back</button>
+
+@code {
+    private Recipe Recipe { get; set; }
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Recipe = await RecipeRepository.GetByIdAsync(Id);
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}
